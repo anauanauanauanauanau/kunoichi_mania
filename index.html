@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>くのいちコンバーター｜写真のピクセルを並べ替えて変身させる無料ツール</title>
+<meta name="description" content="好きな写真のピクセルを並べ替えるだけで、くのいちの絵に変身させる無料のブラウザツール。画像は端末内だけで処理され、アップロードされません。変身アニメはGIFで保存できます。">
+<meta name="keywords" content="くのいち,ピクセル,並べ替え,画像変換,ピクセルアート,GIF,アニメーション,無料,ブラウザ">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="theme-color" content="#e0475b">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="くのいちコンバーター">
+<meta property="og:title" content="くのいちコンバーター｜写真のピクセルを並べ替えて変身させる無料ツール">
+<meta property="og:description" content="好きな写真のピクセルを並べ替えるだけで、くのいちに変身。画像は端末内だけで処理されます。">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="くのいちコンバーター">
+<meta name="twitter:description" content="好きな写真のピクセルを並べ替えるだけで、くのいちに変身。変身アニメはGIFで保存できます。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🥷%3C/text%3E%3C/svg%3E">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"くのいちコンバーター","description":"好きな写真のピクセルを並べ替えて、くのいちの絵に変身させる無料のブラウザツール。画像は端末内だけで処理されます。","applicationCategory":"MultimediaApplication","operatingSystem":"Any","browserRequirements":"JavaScriptとCanvasに対応したブラウザ","inLanguage":"ja","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}</script>
+<style>
+:root{--bg:#f6f5f1;--fg:#1c1b19;--mut:#6b675f;--card:#fff;--line:#dcd8cf;--acc:#e0475b;--accfg:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121214;--fg:#eeece6;--mut:#9a968c;--card:#1b1b1f;--line:#34343a;--acc:#ff6b81;--accfg:#1a1a1a}}
+:root[data-theme="dark"]{--bg:#121214;--fg:#eeece6;--mut:#9a968c;--card:#1b1b1f;--line:#34343a;--acc:#ff6b81;--accfg:#1a1a1a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif;line-height:1.6}
+main{max-width:620px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:1.3rem;margin:0 0 2px}
+p.sub{margin:0 0 14px;color:var(--mut);font-size:.88rem}
+canvas{display:block;margin:0 auto;max-width:100%;height:auto;background:#0b0b12;border-radius:14px;border:1px solid var(--line)}
+.bar{display:flex;gap:10px;align-items:center;margin:12px 0 4px}
+.bar input[type=range]{flex:1;accent-color:var(--acc)}
+button{font:inherit;border:0;border-radius:999px;padding:8px 18px;background:var(--acc);color:var(--accfg);font-weight:600;cursor:pointer}
+button:disabled{opacity:.4;cursor:default}
+button.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.two{display:block;margin-top:10px}
+.pick{display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:12px;cursor:pointer;text-align:center;font-size:.88rem}
+.pick b{font-size:.9rem}
+.pick span{color:var(--mut);font-size:.78rem}
+.pick img{width:100%;max-width:140px;aspect-ratio:1;object-fit:cover;border-radius:8px;display:none}
+.pick input{display:none}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+select{font:inherit;font-size:.85rem;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+#st{color:var(--mut);font-size:.82rem;min-height:1.4em;margin-top:2px}
+.note{margin-top:28px;color:var(--mut);font-size:.82rem}
+.note h2{font-size:.95rem;margin:0 0 6px;color:var(--fg)}
+.note ol{margin:0 0 8px;padding-left:1.3em}
+.note p{margin:0}
+</style>
+</head>
+<body>
+<main>
+<h1>くのいちコンバーター</h1>
+<p class="sub">好きな写真を選ぶと、そのピクセルを並べ替えるだけで、くのいちに変身させます。</p>
+<canvas id="cv" width="600" height="600"></canvas>
+<div class="bar"><button id="pl" disabled>一時停止</button><input id="sl" type="range" min="0" max="1000" value="0" aria-label="進行度"></div>
+<div id="st"></div>
+<div class="two">
+<label class="pick"><b>元の画像</b><span>ピクセルの材料</span><img id="ps" alt=""><input id="sf" type="file" accept="image/*"></label>
+</div>
+<div class="row">
+<select id="rs" aria-label="細かさ"><option value="64">粗い（軽い）</option><option value="96" selected>ふつう</option><option value="128">細かい</option></select>
+<button id="gif" class="ghost" disabled>GIFを保存</button>
+</div>
+<section class="note">
+<h2>使い方</h2>
+<ol>
+<li>「元の画像」に好きな写真を選びます。</li>
+<li>写真のピクセルが並べ替わり、くのいちの絵に変身するアニメーションが始まります。</li>
+<li>スライダーで好きな進行度に止められます。「GIFを保存」でアニメーションを保存できます。</li>
+</ol>
+<p>選んだ画像はお使いの端末のブラウザ内だけで処理され、サーバーには送信されません。</p>
+</section>
+<noscript><p class="note">このツールの利用にはJavaScriptを有効にしてください。</p></noscript>
+</main>
+<script src="target.js"></script>
+<script>
+const $=id=>document.getElementById(id),cv=$('cv'),cx=cv.getContext('2d');
+const mk=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h||w;return c};
+const rnd=s=>()=>(s=s*16807%2147483647)/2147483647;
+const BG='#0b0b12';
+/* ★ 目標の画像（固定）。HTMLと同じフォルダの target.js に window.TARGET_IMAGE="data:image/png;base64,..." と書くか、ここに直接入れる。空なら仮のハート */
+const TARGET_IMAGE=window.TARGET_IMAGE||'';
+function heart(){const n=256,c=mk(n),g=c.getContext('2d');g.fillStyle='#0f1230';g.fillRect(0,0,n,n);const m=n/2,y=n*.14,s=n*.72;
+ g.beginPath();g.moveTo(m,y+.3*s);g.bezierCurveTo(m,y,m-.5*s,y,m-.5*s,y+.3*s);g.bezierCurveTo(m-.5*s,y+.6*s,m,y+.75*s,m,y+.95*s);
+ g.bezierCurveTo(m,y+.75*s,m+.5*s,y+.6*s,m+.5*s,y+.3*s);g.bezierCurveTo(m+.5*s,y,m,y,m,y+.3*s);
+ const gr=g.createRadialGradient(m-.15*s,y+.2*s,0,m,y+.4*s,.6*s);gr.addColorStop(0,'#ff9fb0');gr.addColorStop(1,'#d5173f');g.fillStyle=gr;g.fill();return c}
+let N=96,GW=96,GH=96,CW=600,CH=600,srcD=null,tgtD=heart(),S=null,prog=0,auto=true,clock=0,last=performance.now(),tok=0,busy=false;
+
+/* 目標画像の縦横比に合わせて、ピクセルの格子(GW×GH)と表示サイズを決める */
+function setDims(){
+ const w=tgtD.naturalWidth||tgtD.width,h=tgtD.naturalHeight||tgtD.height,a=Math.min(4,Math.max(.25,w/h));
+ GW=Math.max(8,Math.round(N*Math.sqrt(a)));GH=Math.max(8,Math.round(N/Math.sqrt(a)));
+ if(a>=1){CW=600;CH=Math.round(600/a)}else{CH=600;CW=Math.round(600*a)}
+ cv.width=CW;cv.height=CH}
+function grid(d){const c=mk(GW,GH),g=c.getContext('2d',{willReadFrequently:true}),w=d.naturalWidth||d.width,h=d.naturalHeight||d.height,s=Math.max(GW/w,GH/h);
+ g.drawImage(d,(GW-w*s)/2,(GH-h*s)/2,w*s,h*s);return g.getImageData(0,0,GW,GH).data}
+
+function build(){
+ setDims();
+ if(!srcD){S=null;$('gif').disabled=$('pl').disabled=true;return}
+ const my=++tok;$('st').textContent='ピクセルの並べ替えを計算中…';
+ setTimeout(()=>{
+  if(my!==tok)return;
+  const a=grid(srcD),b=grid(tgtD),M=GW*GH,L=(d,i)=>d[i*4]*.3+d[i*4+1]*.59+d[i*4+2]*.11;
+  const idx=()=>Array.from({length:M},(_,i)=>i),si=idx().sort((p,q)=>L(a,p)-L(a,q)),ti=idx().sort((p,q)=>L(b,p)-L(b,q));
+  const perm=new Int32Array(M);for(let k=0;k<M;k++)perm[si[k]]=ti[k];
+  const cost=(p,t)=>{const dr=a[p*4]-b[t*4],dg=a[p*4+1]-b[t*4+1],db=a[p*4+2]-b[t*4+2],dx=p%GW-t%GW,dy=(p/GW|0)-(t/GW|0);
+   return dr*dr+dg*dg+db*db+20000*(dx*dx+dy*dy)/M};
+  const r=rnd(99);
+  for(let k=0;k<M*300;k++){const p=r()*M|0,q=r()*M|0,tp=perm[p],tq=perm[q];
+   if(cost(p,tq)+cost(q,tp)<cost(p,tp)+cost(q,tq)){perm[p]=tq;perm[q]=tp}}
+  const col=[],dl=new Float32Array(M);
+  for(let p=0;p<M;p++){col.push(`rgb(${a[p*4]},${a[p*4+1]},${a[p*4+2]})`);dl[p]=r()*.35}
+  S={perm,col,dl,a};prog=0;clock=0;auto=true;
+  $('pl').disabled=$('gif').disabled=false;$('pl').textContent='一時停止';
+  $('st').textContent=`${GW}×${GH}、${M.toLocaleString()} 個のピクセルを再配置しました`;
+ },30)}
+
+const ease=e=>e<.5?4*e*e*e:1-Math.pow(-2*e+2,3)/2;
+function render(g,W,H,pr){
+ const cw=W/GW,ch=H/GH,{perm,col,dl}=S;g.fillStyle=BG;g.fillRect(0,0,W,H);
+ for(let p=0;p<GW*GH;p++){
+  const t=perm[p],sx=p%GW,sy=p/GW|0,tx=t%GW,ty=t/GW|0;
+  const e=ease(Math.min(1,Math.max(0,(pr-dl[p])/.65))),am=Math.sin(Math.PI*e)*.15;
+  const x=sx+(tx-sx)*e-(ty-sy)*am,y=sy+(ty-sy)*e+(tx-sx)*am;
+  g.fillStyle=col[p];g.fillRect(x*cw,y*ch,cw+.6,ch+.6)}}
+function empty(){cx.fillStyle=BG;cx.fillRect(0,0,CW,CH);cx.fillStyle='#8d8a9a';cx.font='18px -apple-system,"Hiragino Sans","Noto Sans JP",sans-serif';cx.textAlign='center';
+ cx.fillText('下から元の画像を選んでください',CW/2,CH/2-6);cx.fillText('（決まった絵に並べ替わります）',CW/2,CH/2+22)}
+
+const CYC=7.4,tl=c=>c<.6?0:c<3.6?(c-.6)/3:c<4.4?1:1-(c-4.4)/3;
+function loop(now){const dt=Math.min(.1,(now-last)/1000);last=now;
+ if(S){if(auto){clock=(clock+dt)%CYC;prog=tl(clock);$('sl').value=prog*1000}render(cx,CW,CH,prog)}else empty();
+ requestAnimationFrame(loop)}
+$('sl').oninput=e=>{if(!S)return;auto=false;$('pl').textContent='再生';prog=e.target.value/1000};
+$('pl').onclick=()=>{auto=!auto;$('pl').textContent=auto?'一時停止':'再生';if(auto)clock=.6+prog*3};
+$('rs').onchange=e=>{N=+e.target.value;build()};
+function up(inp,thumb,set){inp.onchange=()=>{const f=inp.files[0];if(!f)return;const fr=new FileReader();
+ fr.onload=()=>{const im=new Image();im.onload=()=>{set(im);thumb.src=fr.result;thumb.style.display='block';build()};
+  im.onerror=()=>{$('st').textContent='この画像は読み込めませんでした'};im.src=fr.result};fr.readAsDataURL(f)}}
+up($('sf'),$('ps'),d=>srcD=d);
+if(TARGET_IMAGE){const im=new Image();im.onload=()=>{tgtD=im;build()};im.src=TARGET_IMAGE}
+
+/* ---- GIF 書き出し（外部ライブラリなし） ---- */
+function makePalette(a,M){
+ let boxes=[Array.from({length:M},(_,i)=>i)];
+ while(boxes.length<255){
+  let bi=-1,bs=0,bc=0;
+  boxes.forEach((b,i)=>{if(b.length<2)return;const mn=[255,255,255],mx=[0,0,0];
+   for(const p of b)for(let c=0;c<3;c++){const v=a[p*4+c];if(v<mn[c])mn[c]=v;if(v>mx[c])mx[c]=v}
+   for(let c=0;c<3;c++){const r=(mx[c]-mn[c])*Math.sqrt(b.length);if(r>bs){bs=r;bi=i;bc=c}}});
+  if(bi<0)break;
+  const b=boxes[bi].sort((p,q)=>a[p*4+bc]-a[q*4+bc]),h=b.length>>1;boxes.splice(bi,1,b.slice(0,h),b.slice(h))}
+ const pal=new Uint8Array(768);
+ boxes.forEach((b,i)=>{let r=0,g=0,bl=0;for(const p of b){r+=a[p*4];g+=a[p*4+1];bl+=a[p*4+2]}pal[i*3]=r/b.length;pal[i*3+1]=g/b.length;pal[i*3+2]=bl/b.length});
+ pal[765]=0x0b;pal[766]=0x0b;pal[767]=0x12;return pal}
+function lzw(ix,out){
+ const bytes=[];let cur=0,nb=0;
+ const put=(c,s)=>{cur|=c<<nb;nb+=s;while(nb>=8){bytes.push(cur&255);cur>>=8;nb-=8}};
+ let next=258,size=9,dict=new Map(),pre=ix[0];put(256,size);
+ for(let i=1;i<ix.length;i++){const k=ix[i],key=pre<<8|k,c=dict.get(key);
+  if(c!==undefined)pre=c;
+  else{put(pre,size);
+   if(next===4096){put(256,size);next=258;size=9;dict.clear()}
+   else{if(next>=(1<<size))size++;dict.set(key,next++)}
+   pre=k}}
+ put(pre,size);put(257,size);if(nb>0)bytes.push(cur&255);
+ out.push(8);for(let i=0;i<bytes.length;i+=255){const n=Math.min(255,bytes.length-i);out.push(n);for(let j=0;j<n;j++)out.push(bytes[i+j])}out.push(0)}
+async function makeGif(){
+ const F=40,{a}=S,pal=makePalette(a,GW*GH),cache=new Int16Array(32768).fill(-1);
+ const Gw=CW>=CH?320:Math.round(320*CW/CH),Gh=CH>=CW?320:Math.round(320*CH/CW);
+ const near=(r,g,b)=>{const k=(r>>3)<<10|(g>>3)<<5|(b>>3);let v=cache[k];if(v>=0)return v;
+  const rr=(r&248)|4,gg=(g&248)|4,bb=(b&248)|4;let best=1e9;v=255;
+  for(let i=0;i<256;i++){const d=(pal[i*3]-rr)**2+(pal[i*3+1]-gg)**2+(pal[i*3+2]-bb)**2;if(d<best){best=d;v=i}}
+  return cache[k]=v};
+ const c=mk(Gw,Gh),g=c.getContext('2d',{willReadFrequently:true}),out=[],w16=v=>out.push(v&255,v>>8&255);
+ 'GIF89a'.split('').forEach(ch=>out.push(ch.charCodeAt(0)));w16(Gw);w16(Gh);out.push(0xF7,255,0);for(let i=0;i<768;i++)out.push(pal[i]);
+ out.push(0x21,0xFF,11);'NETSCAPE2.0'.split('').forEach(ch=>out.push(ch.charCodeAt(0)));out.push(3,1,0,0,0);
+ const seq=[[0,60]];for(let i=1;i<=F;i++)seq.push([i/F,5]);seq.push([1,80]);for(let i=F-1;i>=1;i--)seq.push([i/F,5]);
+ for(let n=0;n<seq.length;n++){
+  const [pr,dly]=seq[n];render(g,Gw,Gh,pr);const d=g.getImageData(0,0,Gw,Gh).data,ix=new Uint8Array(Gw*Gh);
+  for(let i=0;i<Gw*Gh;i++)ix[i]=near(d[i*4],d[i*4+1],d[i*4+2]);
+  out.push(0x21,0xF9,4,4);w16(dly);out.push(0,0);out.push(0x2C);w16(0);w16(0);w16(Gw);w16(Gh);out.push(0);lzw(ix,out);
+  $('st').textContent=`GIFを生成中… ${n+1} / ${seq.length}`;await new Promise(r=>setTimeout(r))}
+ out.push(0x3B);return new Uint8Array(out)}
+$('gif').onclick=async()=>{
+ if(!S||busy)return;busy=true;$('gif').disabled=true;
+ try{
+  const dl=window.claude?await claude.use('downloads'):null;
+  const bytes=await makeGif(),blob=new Blob([bytes],{type:'image/gif'});
+  if(dl)await dl.save({filename:'pixel-shuffle.gif',data:blob});
+  else{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='pixel-shuffle.gif';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
+  $('st').textContent='GIFを保存しました';
+ }catch(e){$('st').textContent=e&&e.code==='declined'?'保存をキャンセルしました':'GIFの保存に失敗しました'}
+ finally{busy=false;$('gif').disabled=false}};
+
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
